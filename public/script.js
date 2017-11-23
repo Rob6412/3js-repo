@@ -480,8 +480,8 @@ ParticlesHolder.prototype.spawnParticles = function(pos, density, color, scale) 
 }
 
 Coin = function() {
-    var geom = new THREE.CylinderGeometry(5, 5, 1, 12);
-    var mat = new THREE.MeshPhongMaterial({color: 0xffff66, shininess: 0, specular: 0xffffff, shading: THREE.FlatShading});
+    var geom = new THREE.SphereGeometry(5, 5, 1);
+    var mat = new THREE.MeshPhongMaterial({color: Colors.blue, shininess: 10, specular: 0xffffff, shading: THREE.FlatShading});
     this.mesh = new THREE.Mesh(geom, mat);
     this.mesh.castShadow = true;
     this.angle = 0;
@@ -538,7 +538,7 @@ CoinsHolder.prototype.rotateCoins = function() {
         if (d < game.coinDistanceTolerance) {
             this.coinsPool.unshift(this.coinsInUse.splice(i, 1)[0]);
             this.mesh.remove(coin.mesh);
-            particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0xffff66, .8);
+            particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, Colors.blue, .8);
             addEnergy();
 
             var audio = document.createElement('audio');
@@ -556,7 +556,7 @@ CoinsHolder.prototype.rotateCoins = function() {
 }
 
 Token = function() {
-    var geom = new THREE.SphereGeometry(3, 12, 12, 12);
+    var geom = new THREE.SphereGeometry(5, 5, 5, 6);
     var mat = new THREE.MeshPhongMaterial({color: Colors.red, shininess: 0, specular: 0xffffff, shading: THREE.FlatShading});
     this.mesh = new THREE.Mesh(geom, mat);
     this.mesh.castShadow = true;
@@ -718,7 +718,7 @@ function loop() {
             game.level++;
             // fieldLevel.innerHTML = Math.floor(game.level);
 
-            // game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel * game.level
+            game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel * game.level
         }
 
         updatePlane();
@@ -728,8 +728,6 @@ function loop() {
         game.speed = game.baseSpeed * game.planeSpeed;
 
     } else if (game.status == "gameover") {
-
-
 
         game.speed *= .99;
         airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0002 * deltaTime;
@@ -743,7 +741,7 @@ function loop() {
             var audioLoader = new THREE.AudioLoader();
             audioLoader.load('/public/bang.mp3', function(buffer) {
                 sound.setBuffer(buffer)
-                sound.setVolume(0.3)
+                sound.setVolume(0.1)
                 sound.play()
             })
 
@@ -781,8 +779,8 @@ function updateDistance() {
 }
 
 function updateEnergy() {
-    // game.energy -= game.speed * deltaTime * game.ratioSpeedEnergy;
-    // game.energy = Math.max(0, game.energy);
+    game.energy -= game.speed * deltaTime * game.ratioSpeedEnergy;
+    game.energy = Math.max(0, game.energy);
     energyBar.style.right = (100 - game.energy) + "%";
     energyBar.style.backgroundColor = (game.energy < 50)
         ? "#f25346"
