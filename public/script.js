@@ -735,18 +735,6 @@ function loop() {
         game.planeFallSpeed *= 1.05;
         airplane.mesh.position.y -= game.planeFallSpeed * deltaTime;
 
-        if (airplane.mesh.position.y < -100) {
-            var listener = new THREE.AudioListener()
-            var sound = new THREE.Audio(listener)
-            var audioLoader = new THREE.AudioLoader();
-            audioLoader.load('/public/bang.mp3', function(buffer) {
-                sound.setBuffer(buffer)
-                sound.setVolume(0.1)
-                sound.play()
-            })
-
-        }
-
         if (airplane.mesh.position.y < -200) {
             showReplay();
             game.status = "waitingReplay";
