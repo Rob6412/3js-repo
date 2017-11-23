@@ -718,7 +718,7 @@ function loop() {
             game.level++;
             // fieldLevel.innerHTML = Math.floor(game.level);
 
-            game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel * game.level
+            // game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel * game.level
         }
 
         updatePlane();
