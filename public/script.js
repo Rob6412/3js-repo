@@ -737,6 +737,12 @@ function loop() {
 
         if (airplane.mesh.position.y < -200) {
             showReplay();
+            var audio = document.createElement('audio');
+            var source = document.createElement('source');
+            source.src = '/public/bang.mp3';
+            audio.appendChild(source);
+            audio.play();
+
             game.status = "waitingReplay";
 
         }
