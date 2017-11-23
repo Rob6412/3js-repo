@@ -157,8 +157,8 @@ function createLights() {
     shadowLight.shadow.camera.bottom = -400;
     shadowLight.shadow.camera.near = 1;
     shadowLight.shadow.camera.far = 1000;
-    shadowLight.shadow.mapSize.width = 4096;
-    shadowLight.shadow.mapSize.height = 4096;
+    shadowLight.shadow.mapSize.width = 2048;
+    shadowLight.shadow.mapSize.height = 2048;
     scene.add(hemisphereLight);
     scene.add(shadowLight);
     scene.add(ambientLight);
