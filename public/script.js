@@ -730,7 +730,7 @@ function loop() {
     } else if (game.status == "gameover") {
 
         game.speed *= .99;
-        airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0002 * deltaTime;
+        airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0003 * deltaTime;
         airplane.mesh.rotation.x += 0.0003 * deltaTime;
         game.planeFallSpeed *= 1.05;
         airplane.mesh.position.y -= game.planeFallSpeed * deltaTime;
