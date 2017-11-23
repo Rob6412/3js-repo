@@ -28,6 +28,7 @@ var controls
 var HEIGHT
 var WIDTH
 var mousePos = {x: 0, y: 0};
+var sheild;
 
 function resetGame() {
     game = {
@@ -35,8 +36,8 @@ function resetGame() {
         initSpeed: .00035,
         baseSpeed: .00035,
         targetBaseSpeed: .00035,
-        incrementSpeedByTime: .0000005,
-        incrementSpeedByLevel: .0000005,
+        incrementSpeedByTime: .000002,
+        incrementSpeedByLevel: .000002,
         distanceForSpeedUpdate: 100,
         speedLastUpdate: 0,
 
@@ -47,7 +48,7 @@ function resetGame() {
 
         level: 1,
         levelLastUpdate: 0,
-        distanceForLevelUpdate: 10000,
+        distanceForLevelUpdate: 1000,
 
         planeDefaultHeight: 100,
         planeAmpHeight: 80,
@@ -88,12 +89,35 @@ function resetGame() {
         ennemyLastSpawn: 0,
         distanceForEnnemiesSpawn: 50,
 
-        status: "playing"
+        status: "playing",
+        DistanceTolerance: 15,
+        tokenValue: 3,
+        tokenSpeed: .5,
+        tokenLastSpawn: 0,
+        distanceForTokenSpawn: 300,
+        tokenDistanceTolerance: 15
+
     };
     // fieldLevel.innerHTML = Math.floor(game.level);
 }
 
 function createScene() {
+    // var audio = document.createElement('audio');
+    // var source = document.createElement('source');
+    // source.src = '/public/backtrack.mp3';
+    // audio.appendChild(source);
+    // audio.play();
+    // audio.setLoop(true);
+
+    var listener = new THREE.AudioListener()
+    var sound = new THREE.Audio(listener)
+    var audioLoader = new THREE.AudioLoader();
+    audioLoader.load('/public/backtrack.mp3', function(buffer) {
+        sound.setBuffer(buffer)
+        sound.setLoop(true)
+        sound.setVolume(0.8)
+        sound.play()
+    })
 
     HEIGHT = window.innerHeight;
     WIDTH = window.innerWidth;
@@ -144,9 +168,14 @@ function createLights() {
 var AirPlane = function() {
     this.mesh = new THREE.Object3D();
     this.mesh.name = "airPlane"
+    // create the sheild
+    var sheildGeom = new THREE.SphereGeometry(120, 6, 6);
+    var sheildMat = new THREE.MeshPhongMaterial({color: 0x1F363D, transparent: true, opacity: 0.3, shading: THREE.FlatShading});
     // create the cabin
     var geomCockpit = new THREE.SphereGeometry(50, 6, 6);
     var matCockpit = new THREE.MeshPhongMaterial({color: 0x000000, transparent: true, opacity: 0.5, shading: THREE.FlatShading});
+    var sheild = new THREE.Mesh(sheildGeom, sheildMat)
+    // this.mesh.add(sheild)
     //combining dome
     var cockpit = new THREE.Mesh(geomCockpit, matCockpit);
     cockpit.position.y = 15;
@@ -342,11 +371,25 @@ EnnemiesHolder.prototype.rotateEnnemies = function() {
         if (d < game.ennemyDistanceTolerance) {
             particlesHolder.spawnParticles(ennemy.mesh.position.clone(), 15, Colors.brownDark, 3);
 
+            addSheild();
+
+            var audio = document.createElement('audio');
+            var source = document.createElement('source');
+            source.src = '/public/shield.wav';
+            audio.appendChild(source);
+            audio.play();
+
+            // var audio = document.createElement('audio');
+            // var source = document.createElement('source');
+            // source.src = '/public/crash.wav';
+            // audio.appendChild(source);
+            // audio.play();
+
             ennemiesPool.unshift(this.ennemiesInUse.splice(i, 1)[0]);
             this.mesh.remove(ennemy.mesh);
             game.planeCollisionSpeedX = 100 * diffPos.x / d;
             game.planeCollisionSpeedY = 100 * diffPos.y / d;
-            ambientLight.intensity = 2;
+            ambientLight.intensity = 1;
 
             removeEnergy();
             i--;
@@ -357,6 +400,21 @@ EnnemiesHolder.prototype.rotateEnnemies = function() {
         }
     }
 }
+
+function addSheild() {
+    var sheildGeom = new THREE.SphereGeometry(120, 16, 16);
+    var sheildMat = new THREE.MeshPhongMaterial({color: 0x1F363D, transparent: true, opacity: 0.2, shading: THREE.FlatShading});
+    var sheild = new THREE.Mesh(sheildGeom, sheildMat)
+    airplane.mesh.add(sheild)
+
+    setTimeout(sheildRemove, 200);
+    function sheildRemove() {
+        console.log("removing sheild");
+        airplane.mesh.remove(sheild)
+    }
+
+}
+
 
 Particle = function() {
     var geom = new THREE.TetrahedronGeometry(3, 0);
@@ -373,6 +431,7 @@ Particle.prototype.explode = function(pos, color, scale) {
     var targetX = pos.x + (-1 + Math.random() * 2) * 50;
     var targetY = pos.y + (-1 + Math.random() * 2) * 50;
     var speed = .6 + Math.random() * .2;
+
     TweenMax.to(this.mesh.rotation, speed, {
         x: Math.random() * 12,
         y: Math.random() * 12
@@ -481,6 +540,12 @@ CoinsHolder.prototype.rotateCoins = function() {
             this.mesh.remove(coin.mesh);
             particlesHolder.spawnParticles(coin.mesh.position.clone(), 5, 0xffff66, .8);
             addEnergy();
+
+            var audio = document.createElement('audio');
+            var source = document.createElement('source');
+            source.src = '/public/token.wav';
+            audio.appendChild(source);
+            audio.play();
             i--;
         } else if (coin.angle > Math.PI) {
             this.coinsPool.unshift(this.coinsInUse.splice(i, 1)[0]);
@@ -488,6 +553,86 @@ CoinsHolder.prototype.rotateCoins = function() {
             i--;
         }
     }
+}
+
+Token = function() {
+    var geom = new THREE.SphereGeometry(3, 12, 12, 12);
+    var mat = new THREE.MeshPhongMaterial({color: Colors.red, shininess: 0, specular: 0xffffff, shading: THREE.FlatShading});
+    this.mesh = new THREE.Mesh(geom, mat);
+    this.mesh.castShadow = true;
+    this.angle = 0;
+    this.dist = 0;
+}
+
+TokenHolder = function(nToken) {
+    this.mesh = new THREE.Object3D();
+    this.tokenInUse = [];
+    this.tokenPool = [];
+    for (var i = 0; i < nToken; i++) {
+        var token = new Token();
+        this.tokenPool.push(token);
+    }
+}
+
+TokenHolder.prototype.spawnToken = function() {
+
+    var nToken = 1 + Math.floor(Math.random());
+    var d = game.seaRadius + game.planeDefaultHeight + (-1 + Math.random() * 2) * (game.planeAmpHeight - 20);
+    var amplitude = 10 + Math.round(Math.random() * 10);
+    for (var i = 0; i < nToken; i++) {
+        var token;
+        if (this.tokenPool.length) {
+            token = this.tokenPool.pop();
+        } else {
+            token = new Token();
+        }
+        this.mesh.add(token.mesh);
+        this.tokenInUse.push(token);
+        token.angle = -(i * 0.02);
+        token.distance = d + Math.cos(i * .5) * amplitude;
+        token.mesh.position.y = -game.seaRadius + Math.sin(token.angle) * token.distance;
+        token.mesh.position.x = Math.cos(token.angle) * token.distance;
+    }
+}
+
+TokenHolder.prototype.rotateToken = function() {
+    for (var i = 0; i < this.tokenInUse.length; i++) {
+        var token = this.tokenInUse[i];
+        if (token.exploding)
+            continue;
+        token.angle += game.speed * deltaTime * game.tokenSpeed;
+        if (token.angle > Math.PI * 2)
+            token.angle -= Math.PI * 2;
+        token.mesh.position.y = -game.seaRadius + Math.sin(token.angle) * token.distance;
+        token.mesh.position.x = Math.cos(token.angle) * token.distance;
+        token.mesh.rotation.z += Math.random() * .1;
+        token.mesh.rotation.y += Math.random() * .1;
+
+        //var globalCoinPosition =  coin.mesh.localToWorld(new THREE.Vector3());
+        var diffPos = airplane.mesh.position.clone().sub(token.mesh.position.clone());
+        var d = diffPos.length();
+        if (d < game.tokenDistanceTolerance) {
+            this.tokenPool.unshift(this.tokenInUse.splice(i, 1)[0]);
+            this.mesh.remove(token.mesh);
+            particlesHolder.spawnParticles(token.mesh.position.clone(), 5, Colors.red, .8);
+            reduceSpeed();
+            var audio = document.createElement('audio');
+            var source = document.createElement('source');
+            source.src = '/public/coin.wav';
+            audio.appendChild(source);
+            audio.play();
+            i--;
+        } else if (token.angle > Math.PI) {
+            this.tokenPool.unshift(this.tokenInUse.splice(i, 1)[0]);
+            this.mesh.remove(token.mesh);
+            i--;
+        }
+    }
+}
+
+function reduceSpeed() {
+    game.targetBaseSpeed = .00035
+
 }
 
 // 3D creators
@@ -518,6 +663,11 @@ function createCoins() {
     scene.add(coinsHolder.mesh)
 }
 
+function createToken() {
+    tokenHolder = new TokenHolder(30);
+    scene.add(tokenHolder.mesh)
+}
+
 function createEnnemies() {
     for (var i = 0; i < 10; i++) {
         var ennemy = new Ennemy();
@@ -536,8 +686,8 @@ function createParticles() {
     scene.add(particlesHolder.mesh)
 }
 
-// MASTER FUNCTION
 
+// MASTER FUNCTION
 function loop() {
     newTime = new Date().getTime();
     deltaTime = newTime - oldTime;
@@ -547,6 +697,10 @@ function loop() {
         if (Math.floor(game.distance) % game.distanceForCoinsSpawn == 0 && Math.floor(game.distance) > game.coinLastSpawn) {
             game.coinLastSpawn = Math.floor(game.distance);
             coinsHolder.spawnCoins();
+        }
+        if (Math.floor(game.distance) % game.distanceForTokenSpawn == 0 && Math.floor(game.distance) > game.tokenLastSpawn) {
+            game.tokenLastSpawn = Math.floor(game.distance);
+            tokenHolder.spawnToken();
         }
 
         if (Math.floor(game.distance) % game.distanceForSpeedUpdate == 0 && Math.floor(game.distance) > game.speedLastUpdate) {
@@ -564,7 +718,7 @@ function loop() {
             game.level++;
             // fieldLevel.innerHTML = Math.floor(game.level);
 
-            game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel * game.level
+            // game.targetBaseSpeed = game.initSpeed + game.incrementSpeedByLevel * game.level
         }
 
         updatePlane();
@@ -574,11 +728,26 @@ function loop() {
         game.speed = game.baseSpeed * game.planeSpeed;
 
     } else if (game.status == "gameover") {
+
+
+
         game.speed *= .99;
         airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0002 * deltaTime;
         airplane.mesh.rotation.x += 0.0003 * deltaTime;
         game.planeFallSpeed *= 1.05;
         airplane.mesh.position.y -= game.planeFallSpeed * deltaTime;
+
+        if (airplane.mesh.position.y < -100) {
+            var listener = new THREE.AudioListener()
+            var sound = new THREE.Audio(listener)
+            var audioLoader = new THREE.AudioLoader();
+            audioLoader.load('/public/bang.mp3', function(buffer) {
+                sound.setBuffer(buffer)
+                sound.setVolume(0.3)
+                sound.play()
+            })
+
+        }
 
         if (airplane.mesh.position.y < -200) {
             showReplay();
@@ -587,14 +756,14 @@ function loop() {
         }
     } else if (game.status == "waitingReplay") {}
 
-    sea.mesh.rotation.z += game.speed * deltaTime; //*game.seaRotationSpeed;
+    sea.mesh.rotation.z += game.speed * deltaTime;
 
     if (sea.mesh.rotation.z > 2 * Math.PI)
         sea.mesh.rotation.z -= 2 * Math.PI;
 
     ambientLight.intensity += (.5 - ambientLight.intensity) * deltaTime * 0.005;
-
     coinsHolder.rotateCoins();
+    tokenHolder.rotateToken();
     ennemiesHolder.rotateEnnemies();
 
     sky.moveClouds();
@@ -612,12 +781,12 @@ function updateDistance() {
 }
 
 function updateEnergy() {
-    game.energy -= game.speed * deltaTime * game.ratioSpeedEnergy;
-    game.energy = Math.max(0, game.energy);
+    // game.energy -= game.speed * deltaTime * game.ratioSpeedEnergy;
+    // game.energy = Math.max(0, game.energy);
     energyBar.style.right = (100 - game.energy) + "%";
     energyBar.style.backgroundColor = (game.energy < 50)
-        // ? "#f25346"
-        // : "#68c3c0";
+        ? "#f25346"
+        : "#68c3c0";
 
     if (game.energy < 30) {
         energyBar.style.animationName = "blinking";
@@ -695,6 +864,7 @@ function init(event) {
     createPlane();
     createSea();
     createSky();
+    createToken();
     createCoins();
     createEnnemies();
     createParticles();
