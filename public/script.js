@@ -332,7 +332,7 @@ EnnemiesHolder = function() {
 }
 
 EnnemiesHolder.prototype.spawnEnnemies = function() {
-    var nEnnemies = game.level;
+    var nEnnemies = game.level * 2;
 
     for (var i = 0; i < nEnnemies; i++) {
         var ennemy;
