@@ -48,7 +48,7 @@ function resetGame() {
 
         level: 1,
         levelLastUpdate: 0,
-        distanceForLevelUpdate: 1000,
+        distanceForLevelUpdate: 500,
 
         planeDefaultHeight: 100,
         planeAmpHeight: 80,
@@ -332,7 +332,7 @@ EnnemiesHolder = function() {
 }
 
 EnnemiesHolder.prototype.spawnEnnemies = function() {
-    var nEnnemies = game.level * 2;
+    var nEnnemies = game.level;
 
     for (var i = 0; i < nEnnemies; i++) {
         var ennemy;
