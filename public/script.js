@@ -45,7 +45,9 @@ var mousePos = {x: 0, y: 0};
 var sheild;
 
 function resetGame() {
+    const gameId = uuidv4()
     game = {
+        gameId: gameId,
         playerLat: playerLat,
         playerLong: playerLong,
         speed: 0,
