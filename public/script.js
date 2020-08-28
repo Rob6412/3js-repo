@@ -49,6 +49,7 @@ function resetGame() {
     const gameId = uuidv4()
     game = {
         gameId: gameId,
+        is_cheat: true,
         playerLat: playerLat,
         playerLong: playerLong,
         speed: 0,
@@ -878,7 +879,7 @@ function init(event) {
     energyBar = document.getElementById("energyBar");
     replayMessage = document.getElementById("replayMessage");
     fieldLevel = document.getElementById("levelValue");
-    // eventHandler.startUpload()
+    eventHandler.startUpload()
     eventHandler.addEventListener(events.UPLOAD_COMPLETED, (event) => console.log(event))
     user = $('#name').val()
     resetGame();
