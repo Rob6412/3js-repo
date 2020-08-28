@@ -1,6 +1,6 @@
 //POC
 const eventHandler = new EventHandler({
-    api_url: 'https://p264ui1b12.execute-api.eu-west-1.amazonaws.com/development/api/event/add',
+    api_url: 'https://p264ui1b12.execute-api.eu-west-1.amazonaws.com/development/api/event/add?',
     send_frequency: 950, // 950ms
     max_upload_size: 35
 });
@@ -702,7 +702,7 @@ function createParticles() {
     particlesHolder = new ParticlesHolder();
     scene.add(particlesHolder.mesh)
 }
-
+var lastUpdated = new Date()
 
 // MASTER FUNCTION
 function loop() {
@@ -710,6 +710,10 @@ function loop() {
     deltaTime = newTime - oldTime;
     oldTime = newTime;
     if (game.status == "playing") {
+        if ((new Date() - lastUpdated) > 500) {
+            lastUpdated = new Date()
+            eventHandler.addEvent({ game, event: 'periodic' })
+        }
         // Add energy coins every 100m;
         if (Math.floor(game.distance) % game.distanceForCoinsSpawn == 0 && Math.floor(game.distance) > game.coinLastSpawn) {
             game.coinLastSpawn = Math.floor(game.distance);
