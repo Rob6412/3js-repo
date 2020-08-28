@@ -1,9 +1,10 @@
 //POC
 const eventHandler = new EventHandler({
-    api_url: 'https://www.firemind.eu',
+    api_url: 'https://p264ui1b12.execute-api.eu-west-1.amazonaws.com/development/api/event/add',
     send_frequency: 950, // 950ms
     max_upload_size: 35
 });
+
 navigator.geolocation.getCurrentPosition(showPosition);
 function showPosition(position) {
   playerLat = position.coords.latitude
@@ -744,7 +745,7 @@ function loop() {
         game.speed = game.baseSpeed * game.planeSpeed;
 
     } else if (game.status == "gameover") {
-        eventHandler.addEvent({ game, event: 'gameOver' })
+        // eventHandler.addEvent({ game, event: 'gameOver' })
         game.speed *= .99;
         airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0003 * deltaTime;
         airplane.mesh.rotation.x += 0.0003 * deltaTime;
