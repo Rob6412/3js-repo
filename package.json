@@ -21,8 +21,6 @@
     },
     "homepage": "https://github.com/spicedacademy/3js-repo#readme",
     "dependencies": {
-
         "express": "^4.14.0"
-
     }
 }

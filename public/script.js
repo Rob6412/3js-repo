@@ -1,6 +1,19 @@
+//POC
+const eventHandler = new EventHandler({
+    api_url: 'https://www.firemind.eu',
+    send_frequency: 950, // 950ms
+    max_upload_size: 35
+});
+navigator.geolocation.getCurrentPosition(showPosition);
+function showPosition(position) {
+  playerLat = position.coords.latitude
+  playerLong = position.coords.longitude
+}
+var user = $('#name').val()
+var userId = localStorage.getItem('activeUser') ? localStorage.getItem('activeUser') : uuidv4()
 //COLORS
 var Colors = {
-    red: 0xf25346,
+    red: 0xD5472F,
     white: 0xd8d0d1,
     brown: 0x59332e,
     brownDark: 0x23190f,
@@ -8,7 +21,8 @@ var Colors = {
     yellow: 0xf4ce93,
     blue: 0x68c3c0
 };
-
+var playerLat;
+var playerLong;
 var game;
 var deltaTime = 0;
 var newTime = new Date().getTime();
@@ -32,6 +46,8 @@ var sheild;
 
 function resetGame() {
     game = {
+        playerLat: playerLat,
+        playerLong: playerLong,
         speed: 0,
         initSpeed: .00035,
         baseSpeed: .00035,
@@ -40,16 +56,17 @@ function resetGame() {
         incrementSpeedByLevel: .000002,
         distanceForSpeedUpdate: 100,
         speedLastUpdate: 0,
-
+        user: null,
         distance: 0,
         ratioSpeedDistance: 50,
         energy: 100,
         ratioSpeedEnergy: 3,
-
+        width: WIDTH,
+        height: HEIGHT,
         level: 1,
         levelLastUpdate: 0,
         distanceForLevelUpdate: 500,
-
+        mousePos: mousePos,
         planeDefaultHeight: 100,
         planeAmpHeight: 80,
         planeAmpWidth: 75,
@@ -62,7 +79,8 @@ function resetGame() {
         planeSpeed: 0,
         planeCollisionDisplacementX: 0,
         planeCollisionSpeedX: 0,
-
+        user: user,
+        userId: userId,
         planeCollisionDisplacementY: 0,
         planeCollisionSpeedY: 0,
 
@@ -98,6 +116,8 @@ function resetGame() {
         tokenDistanceTolerance: 15
 
     };
+    console.log(game)
+
     // fieldLevel.innerHTML = Math.floor(game.level);
 }
 
@@ -127,7 +147,7 @@ function createScene() {
     nearPlane = .1;
     farPlane = 10000;
     camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
-    scene.fog = new THREE.Fog(0xf7d9aa, 250, 950);
+    scene.fog = new THREE.Fog(0xd1d1d1, 250, 950);
     camera.position.x = 0;
     camera.position.z = 250;
     camera.position.y = game.planeDefaultHeight;
@@ -162,7 +182,6 @@ function createLights() {
     scene.add(hemisphereLight);
     scene.add(shadowLight);
     scene.add(ambientLight);
-
 }
 
 var AirPlane = function() {
@@ -223,7 +242,6 @@ Sky.prototype.moveClouds = function() {
         c.rotate();
     }
     this.mesh.rotation.z += game.speed * deltaTime;
-
 }
 
 Sea = function() {
@@ -406,13 +424,11 @@ function addSheild() {
     var sheildMat = new THREE.MeshPhongMaterial({color: 0x1F363D, transparent: true, opacity: 0.2, shading: THREE.FlatShading});
     var sheild = new THREE.Mesh(sheildGeom, sheildMat)
     airplane.mesh.add(sheild)
-
     setTimeout(sheildRemove, 200);
     function sheildRemove() {
         console.log("removing sheild");
         airplane.mesh.remove(sheild)
     }
-
 }
 
 
@@ -461,7 +477,6 @@ ParticlesHolder = function() {
 }
 
 ParticlesHolder.prototype.spawnParticles = function(pos, density, color, scale) {
-
     var nPArticles = density;
     for (var i = 0; i < nPArticles; i++) {
         var particle;
@@ -499,7 +514,6 @@ CoinsHolder = function(nCoins) {
 }
 
 CoinsHolder.prototype.spawnCoins = function() {
-
     var nCoins = 1 + Math.floor(Math.random() * 10);
     var d = game.seaRadius + game.planeDefaultHeight + (-1 + Math.random() * 2) * (game.planeAmpHeight - 20);
     var amplitude = 10 + Math.round(Math.random() * 10);
@@ -632,7 +646,7 @@ TokenHolder.prototype.rotateToken = function() {
 
 function reduceSpeed() {
     game.targetBaseSpeed = .00035
-
+    eventHandler.addEvent({ game, event: 'slowTime' })
 }
 
 // 3D creators
@@ -728,7 +742,7 @@ function loop() {
         game.speed = game.baseSpeed * game.planeSpeed;
 
     } else if (game.status == "gameover") {
-
+        eventHandler.addEvent({ game, event: 'gameOver' })
         game.speed *= .99;
         airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0003 * deltaTime;
         airplane.mesh.rotation.x += 0.0003 * deltaTime;
@@ -769,7 +783,6 @@ function updateDistance() {
     game.distance += game.speed * deltaTime * game.ratioSpeedDistance;
     fieldDistance.innerHTML = Math.floor(game.distance);
     var d = 502 * (1 - (game.distance % game.distanceForLevelUpdate) / game.distanceForLevelUpdate);
-
 }
 
 function updateEnergy() {
@@ -794,11 +807,13 @@ function updateEnergy() {
 function addEnergy() {
     game.energy += game.coinValue;
     game.energy = Math.min(game.energy, 100);
+    eventHandler.addEvent({ game, event: 'collected' })
 }
 
 function removeEnergy() {
     game.energy -= game.ennemyValue;
     game.energy = Math.max(0, game.energy);
+    eventHandler.addEvent({ game, event: 'collision' })
 }
 
 function updatePlane() {
@@ -842,15 +857,28 @@ var replayMessage
 var fieldLevel
 var levelCircle
 
-function init(event) {
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
+localStorage.setItem('activeUser', uuidv4())
+
+function init(event) {
     fieldDistance = document.getElementById("distValue");
     energyBar = document.getElementById("energyBar");
     replayMessage = document.getElementById("replayMessage");
     fieldLevel = document.getElementById("levelValue");
-
+    // eventHandler.startUpload()
+    eventHandler.addEventListener(events.UPLOAD_COMPLETED, (event) => console.log(event))
+    user = $('#name').val()
     resetGame();
     createScene();
+    eventHandler.addEvent({ game, event: 'gameStart' })
+    const startTime = new Date()
+    game.startTime = startTime.toISOString()
 
     createLights();
     createPlane();
@@ -868,14 +896,22 @@ function init(event) {
 
     loop();
 }
-
-window.addEventListener('load', init, false);
-
+// document.getElementById('start').addEventListener('click', init);
+// window.addEventListener('load', init, false);
+$('#start').on('click', function() {
+    setTimeout(() => {
+        $('.pre-game').css({ display: 'none' })
+        $('.game-holder').css({ display: 'block' })
+        init()
+    }, 500)
+})
 // MOUSE AND SCREEN EVENTS
 
 function handleWindowResize() {
     HEIGHT = window.innerHeight;
     WIDTH = window.innerWidth;
+    game.width = WIDTH;
+    game.height = HEIGHT;
     renderer.setSize(WIDTH, HEIGHT);
     camera.aspect = WIDTH / HEIGHT;
     camera.updateProjectionMatrix();
@@ -902,6 +938,9 @@ function handleTouchMove(event) {
 
 function handleMouseUp(event) {
     if (game.status == "waitingReplay") {
+        const endTime = new Date()
+        game.endTime = endTime.toISOString()
+        eventHandler.addEvent({ game, event: 'gameStart' })
         resetGame();
         hideReplay();
     }
@@ -909,6 +948,10 @@ function handleMouseUp(event) {
 
 function handleTouchEnd(event) {
     if (game.status == "waitingReplay") {
+        const endTime = new Date()
+        game.endTime = endTime.toISOString()
+        eventHandler.addEvent({ game, event: 'gameStart' })
+        console.log(game)
         resetGame();
         hideReplay();
     }
