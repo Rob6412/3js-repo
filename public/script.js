@@ -1,14 +1,14 @@
 //POC
 const eventHandler = new EventHandler({
     api_url: 'https://p264ui1b12.execute-api.eu-west-1.amazonaws.com/development/api/event/add?',
-    send_frequency: 950, // 950ms
+    send_frequency: 2000, // 950ms
     max_upload_size: 35
 });
 
 navigator.geolocation.getCurrentPosition(showPosition);
 function showPosition(position) {
-  playerLat = position.coords.latitude
-  playerLong = position.coords.longitude
+  game.playerLat = position.coords.latitude
+  game.playerLong = position.coords.longitude
 }
 var user = $('#name').val()
 var userId = localStorage.getItem('activeUser') ? localStorage.getItem('activeUser') : uuidv4()
@@ -49,7 +49,7 @@ function resetGame() {
     const gameId = uuidv4()
     game = {
         gameId: gameId,
-        is_cheat: true,
+        is_cheat: false,
         playerLat: playerLat,
         playerLong: playerLong,
         speed: 0,
@@ -65,8 +65,8 @@ function resetGame() {
         ratioSpeedDistance: 50,
         energy: 100,
         ratioSpeedEnergy: 3,
-        width: WIDTH,
-        height: HEIGHT,
+        width: window.innerWidth,
+        height: window.innerHeight,
         level: 1,
         levelLastUpdate: 0,
         distanceForLevelUpdate: 500,
@@ -121,7 +121,6 @@ function resetGame() {
 
     };
     console.log(game)
-
     // fieldLevel.innerHTML = Math.floor(game.level);
 }
 
@@ -704,14 +703,15 @@ function createParticles() {
     scene.add(particlesHolder.mesh)
 }
 var lastUpdated = new Date()
-
+var gameover = false
 // MASTER FUNCTION
 function loop() {
     newTime = new Date().getTime();
     deltaTime = newTime - oldTime;
     oldTime = newTime;
     if (game.status == "playing") {
-        if ((new Date() - lastUpdated) > 500) {
+        gameover = false
+        if ((new Date() - lastUpdated) > 250) {
             lastUpdated = new Date()
             eventHandler.addEvent({ game, event: 'periodic' })
         }
@@ -750,7 +750,11 @@ function loop() {
         game.speed = game.baseSpeed * game.planeSpeed;
 
     } else if (game.status == "gameover") {
-        // eventHandler.addEvent({ game, event: 'gameOver' })
+        if (gameover === false) {
+            lastUpdated = new Date()
+            eventHandler.addEvent({ game, event: 'gameOver' })
+            gameover = true
+        }
         game.speed *= .99;
         airplane.mesh.rotation.z += (-Math.PI / 2 - airplane.mesh.rotation.z) * .0003 * deltaTime;
         airplane.mesh.rotation.x += 0.0003 * deltaTime;
@@ -882,9 +886,9 @@ function init(event) {
     eventHandler.startUpload()
     eventHandler.addEventListener(events.UPLOAD_COMPLETED, (event) => console.log(event))
     user = $('#name').val()
+    navigator.geolocation.getCurrentPosition(showPosition);
     resetGame();
     createScene();
-    eventHandler.addEvent({ game, event: 'gameStart' })
     const startTime = new Date()
     game.startTime = startTime.toISOString()
 
@@ -902,6 +906,7 @@ function init(event) {
     document.addEventListener('mouseup', handleMouseUp, false);
     document.addEventListener('touchend', handleTouchEnd, false);
 
+    eventHandler.addEvent({ game, event: 'gameStart' })
     loop();
 }
 // document.getElementById('start').addEventListener('click', init);
