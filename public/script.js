@@ -1,6 +1,6 @@
 //POC
 const eventHandler = new EventHandler({
-    api_url: 'https://p264ui1b12.execute-api.eu-west-1.amazonaws.com/development/api/event/add?',
+    api_url: 'https://asteroid-attack-collector.gametech.firemind.io/api/event/add?',
     send_frequency: 2000, // 950ms
     max_upload_size: 35
 });
@@ -49,7 +49,7 @@ function resetGame() {
     const gameId = uuidv4()
     game = {
         gameId: gameId,
-        is_cheat: false,
+        is_cheat: true,
         playerLat: playerLat,
         playerLong: playerLong,
         speed: 0,
