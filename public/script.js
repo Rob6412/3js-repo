@@ -10,18 +10,21 @@ function showPosition(position) {
   game.playerLat = position.coords.latitude
   game.playerLong = position.coords.longitude
 }
+
 var user = $('#name').val()
 var userId = localStorage.getItem('activeUser') ? localStorage.getItem('activeUser') : uuidv4()
+
 //COLORS
 var Colors = {
-    red: 0xD5472F,
+    red: 0x49D49D,
     white: 0xd8d0d1,
-    brown: 0x59332e,
+    brown: 0x7B726B,
     brownDark: 0x23190f,
     pink: 0xF5986E,
     yellow: 0xf4ce93,
-    blue: 0x68c3c0
+    blue: 0xff7b1c
 };
+
 var playerLat;
 var playerLong;
 var game;
@@ -118,7 +121,6 @@ function resetGame() {
         tokenLastSpawn: 0,
         distanceForTokenSpawn: 300,
         tokenDistanceTolerance: 15
-
     };
     console.log(game)
     // fieldLevel.innerHTML = Math.floor(game.level);
@@ -169,8 +171,8 @@ var hemisphereLight
 var shadowLight
 
 function createLights() {
-    hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, .9)
-    ambientLight = new THREE.AmbientLight(0xdc8874, .5);
+    hemisphereLight = new THREE.HemisphereLight(0x7B726B, 0x000000, .9)
+    ambientLight = new THREE.AmbientLight(0x7B726B, .5);
     shadowLight = new THREE.DirectionalLight(0xffffff, .9);
     shadowLight.position.set(150, 350, 350);
     shadowLight.castShadow = true;
@@ -429,7 +431,6 @@ function addSheild() {
     airplane.mesh.add(sheild)
     setTimeout(sheildRemove, 200);
     function sheildRemove() {
-        console.log("removing sheild");
         airplane.mesh.remove(sheild)
     }
 }
@@ -803,7 +804,7 @@ function updateEnergy() {
     energyBar.style.right = (100 - game.energy) + "%";
     energyBar.style.backgroundColor = (game.energy < 50)
         ? "#f25346"
-        : "#68c3c0";
+        : "#ff7b1c";
 
     if (game.energy < 30) {
         energyBar.style.animationName = "blinking";
@@ -883,7 +884,7 @@ function init(event) {
     energyBar = document.getElementById("energyBar");
     replayMessage = document.getElementById("replayMessage");
     fieldLevel = document.getElementById("levelValue");
-    eventHandler.startUpload()
+    // eventHandler.startUpload()
     eventHandler.addEventListener(events.UPLOAD_COMPLETED, (event) => console.log(event))
     user = $('#name').val()
     navigator.geolocation.getCurrentPosition(showPosition);
@@ -912,11 +913,18 @@ function init(event) {
 // document.getElementById('start').addEventListener('click', init);
 // window.addEventListener('load', init, false);
 $('#start').on('click', function() {
-    setTimeout(() => {
-        $('.pre-game').css({ display: 'none' })
-        $('.game-holder').css({ display: 'block' })
-        init()
-    }, 500)
+    $('#user-error').css({ display: 'none' })
+    if ($('#name').val() === '') {
+        $('#user-error').css({ display: 'block' })
+    } else {
+        $('#button-icon').css({ display: 'none'})
+        $('#button-loading').css({ display: 'block'})
+        setTimeout(() => {
+            $('.pre-game').css({ display: 'none' })
+            $('.game-holder').css({ display: 'block' })
+            init()
+        }, 2000)
+    }
 })
 // MOUSE AND SCREEN EVENTS
 

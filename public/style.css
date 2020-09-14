@@ -9,6 +9,18 @@ body {
 	min-width: 100vw;
 }
 
+#button-loading {
+	display: none;
+}
+
+#user-error {
+	display: none;
+	color: #ff7b1c;
+	font-family: 'Space Mono', monospace;
+	font-size: 12px;
+	text-transform: uppercase;
+}
+
 #world {
 	position: absolute;
 	width: 100%;
@@ -53,10 +65,15 @@ body {
 	color: #f0f0f0;
 }
 
+#start {
+	background-color: #ff7b1c;
+  border: none;
+}
+
 .header h1 span {
 	font-size: 15px;
 	z-index: 99999;
-	color: #23190F;
+	color: #ff7b1c;
 }
 
 .header h2 {
@@ -66,7 +83,7 @@ body {
 	text-indent: 1em;
 	letter-spacing: 1em;
 	text-transform: uppercase;
-	color: #d6483b;
+	color: #ff7b1c;
 }
 .header-pre-game {
 	position: absolute;
@@ -91,18 +108,20 @@ body {
 	text-indent: 1em;
 	letter-spacing: 1em;
 	text-transform: uppercase;
-	color: #d6483b;
+	color: #ff7b1c;
 }
 input#name {
-  height: 36px;
+  height: 48px;
   width: 300px;
   border-radius: 10px;
+  padding: 12px;
 }
 
 button#start {
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  outline: none !important;
 }
 
 .score {
@@ -114,7 +133,7 @@ button#start {
 .pre-score-content {
 	position: relative;
 	display: inline-block;
-	top: 300px;
+	top: 20vh;
 	padding: 1em;
 	vertical-align: top;
 	height: 50px;
@@ -122,18 +141,19 @@ button#start {
 .score-content {
 	position: relative;
 	display: inline-block;
-	top: 445px;
+	top: 50vh;
 	padding: 1em;
 	vertical-align: top;
 	height: 50px;
 }
 
-
 .score-content:nth-child(2) {
 	/*border-right: 1px solid white;*/
 	border-left: 1px solid white;
 }
-
+input#name {
+    outline: none !important;
+}
 .score-label {
 	font-size: 9px;
 	position: relative;
@@ -173,7 +193,7 @@ button#start {
 	bottom: 0;
 	left: 0;
 	margin: 2px;
-	background-color: #d6483b;
+	background-color: #ff7b1c;
 	-webkit-animation-name: none;
 	animation-name: none;
 	-webkit-animation-duration: 150ms;
@@ -230,7 +250,7 @@ button#start {
 	display: none;
 	text-indent: 0.5em;
 	letter-spacing: 0.5em;
-	color: #d6483b;
+	color: #ff7b1c;
 }
 
 .message-instructions {
@@ -242,6 +262,11 @@ button#start {
 
 .message--instructions span {
 	display: block;
-	color: #d6483b;
+	color: #ff7b1c;
 	white-space: nowrap;
+}
+
+.btn:focus,.btn:active {
+   outline: none !important;
+   box-shadow: none;
 }

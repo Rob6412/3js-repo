@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>FIREMIND ATTACK</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" title="Cool stylesheet" href="/public/style.css">
     <link href="https://fonts.googleapis.com/css?family=Space+Mono" rel="stylesheet">
 </head>
@@ -12,8 +13,14 @@
             <h2 class="pre-game-secondary">How long can you survive?</h2>
             <div class="pre-score-content">
                 <div class="score-label">USER NAME</div>
-                <input type="text" id="name"><br><br>
-                <button id="start"><i class="fas fa-play"></i></button>
+                <input required type="text" id="name"><br><br>
+                <div id="user-error" class="pb-4">Please enter a valid Username</div>
+                <button id="start" class="btn btn-primary p-2">
+                    <i id="button-icon" class="fas fa-play"></i>
+                    <div id="button-loading" class="spinner-border text-light" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </button>
             </div>
         </div>
     </div>
@@ -38,11 +45,12 @@
         <div class="message message-replay" id="replayMessage">
             <h4>Click to Replay</h4>
         </div>
-        <div class="message message-instructions" id="instructions">Avoid the Asteriods | Blue power ups charge your sheild | Red power ups slow down time</div>
+        <div class="message message-instructions" id="instructions">Avoid the Asteriods | <span class="text-danger">Red</span> power ups charge your sheild | <span class="text-success">Green</span> power ups slow down time</div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/85/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/public/TweenMax.min.js"></script>
     <script src="/public/event-target.js"></script>
     <script src="/public/upload-class.js"></script>
