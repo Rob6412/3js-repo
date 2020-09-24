@@ -7,8 +7,11 @@ const eventHandler = new EventHandler({
 
 navigator.geolocation.getCurrentPosition(showPosition);
 function showPosition(position) {
-  game.playerLat = position.coords.latitude
-  game.playerLong = position.coords.longitude
+    if (!game) {
+        return
+    }
+  game.playerLat = position && position.coords && position.coords.latitude
+  game.playerLong = position && position.coords && position.coords.longitude
 }
 
 var user = $('#name').val()
@@ -53,8 +56,8 @@ function resetGame() {
     game = {
         gameId: gameId,
         is_cheat: true,
-        playerLat: playerLat,
-        playerLong: playerLong,
+        playerLat: playerLat || 0,
+        playerLong: playerLong || 0,
         speed: 0,
         initSpeed: .00035,
         baseSpeed: .00035,
