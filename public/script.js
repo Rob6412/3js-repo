@@ -887,7 +887,7 @@ function init(event) {
     energyBar = document.getElementById("energyBar");
     replayMessage = document.getElementById("replayMessage");
     fieldLevel = document.getElementById("levelValue");
-    // eventHandler.startUpload()
+    eventHandler.startUpload()
     eventHandler.addEventListener(events.UPLOAD_COMPLETED, (event) => console.log(event))
     user = $('#name').val()
     navigator.geolocation.getCurrentPosition(showPosition);
