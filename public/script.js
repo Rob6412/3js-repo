@@ -93,7 +93,7 @@ function resetGame() {
         userId: userId,
         planeCollisionDisplacementY: 0,
         planeCollisionSpeedY: 0,
-
+        startTime: new Date(),
         seaRadius: 600,
         seaLength: 800,
         wavesMinAmp: 5,
