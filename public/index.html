@@ -9,7 +9,9 @@
 <body>
     <div class="pre-game">
         <div class="header-pre-game">
-            <h1 class="pre-game-header">FIREMIND ATTACK</h1>
+            <div class="header-container">
+                <h1 class="pre-game-header">FIREMIND ATTACK</h1>
+            </div>
             <h2 class="pre-game-secondary">How long can you survive?</h2>
             <div class="pre-score-content">
                 <div class="score-label">USER NAME</div>
@@ -23,10 +25,14 @@
                 </button>
             </div>
         </div>
+        <div class="message message-instructions" id="instructions">Avoid the Asteriods | <span class="text-danger">Red</span> power ups charge your sheild | <span class="text-success">Green</span> power ups slow down time</div>
     </div>
     <div class="game-holder" id="gameHolder">
         <div class="header">
-            <h1>FIREMIND ATTACK</h1>
+            <div class="header-container">
+                <h1>FIREMIND ATTACK</h1>
+                <img class="logo" height="70" src="https://marketing-assets.firemind.io/logo/AWS_logo.png" />
+            </div>
             <h2>How long can you survive?</h2>
             <div class="score" id="score">
                 <div class="score-content" id="dist">
@@ -45,7 +51,6 @@
         <div class="message message-replay" id="replayMessage">
             <h4>Click to Replay</h4>
         </div>
-        <div class="message message-instructions" id="instructions">Avoid the Asteriods | <span class="text-danger">Red</span> power ups charge your sheild | <span class="text-success">Green</span> power ups slow down time</div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>

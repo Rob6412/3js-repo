@@ -270,3 +270,15 @@ input#name {
    outline: none !important;
    box-shadow: none;
 }
+
+.header-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  position: absolute;
+  top: 87vh;
+  right: 4%;
+}
